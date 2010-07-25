@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<project name="Test It" default="test" basedir="."
+	xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+	
+	<loadtasks assembly="bin/Debug/NAntWeb.dll" />
+
+	<target name="test_http">
+		<http	url="google.com" method="GET"
+			responseheadersproperty="headers"
+			responsebodyproperty="body"
+			statuscodeproperty="status" />
+		<echo>Status: ${status}</echo>
+		<!--
+		<echo>Headers: ${headers}</echo>
+		<echo>Body: ${body}</echo>
+		-->
+	</target>
+	
+	<target name="test_jit">
+		<http	url="google.com/search?q=nant" method="POST" content="blah=blah&amp;something=something"
+			statuscodeproperty="status" />
+		<echo>Status: ${status}</echo>
+	</target>
+	
+	<target name="test" depends="test_http,test_jit" />
+
+</project>
