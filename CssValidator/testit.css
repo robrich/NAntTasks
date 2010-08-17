@@ -1,0 +1,98 @@
+.ActorTable {
+	margin: 0;
+	border: 0px;
+	width: 99%;
+}
+
+.Pictures {
+	vertical-align: top;
+	width: 200px;
+}
+
+.Pictures a {
+	margin: 10px;
+	text-decoration: none;
+	border: 1px solid #ffffff;
+}
+.Pictures a img {
+	border: 1px solid #aaaaaa;
+}
+.Pictures a:hover img {
+	border: 1px solid #FE9C03;
+}
+.Content {
+}
+
+.Stats {
+	width: 162px;
+	margin: 0 10px 10px 10px;
+}
+
+.StatLabel {
+	width: 40px;
+	float: left;
+	text-align: right;
+	color: #aaaaaa;
+	margin: 2px 5px 0 0;
+}
+
+.StatText {
+	float: left;
+	width: 100px;
+	margin: 2px 0 0 5px;
+}
+
+.Resume {
+	border: 1px solid #888888;
+	border-left: 0px;
+	border-right: 0px;
+	padding: 8px 0 8px 0;
+	margin: 10px;
+	width: 100%;
+}
+
+.Category {
+	background-color: #df9092;
+	font-family: Arial, Helvetica, Sans-Serif;
+	font-size: 11px;
+	font-weight: bold;
+	padding: 3px 0 3px 2px;
+}
+
+.CategorySpace {
+	padding: 4px;
+}
+
+.Item {
+	padding-top: 1px;
+}
+
+.ButtonsWrap {
+	vertical-align: bottom;
+}
+
+.Buttons {
+	width: 150px;
+	margin: 10px;
+}
+
+.ButtonWrap {
+	border: 1px solid #888888;
+	text-align: center;
+	padding: 10px;
+}
+
+.ButtonSpace {
+	padding: 7px;
+}
+
+.Button {
+	font-weight: bold;
+	font-size: 12px;
+	color: #555555;
+	text-decoration: none;
+}
+
+.Button:hover {
+	color: #FE9C03;
+}
