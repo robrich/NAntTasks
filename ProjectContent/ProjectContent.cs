@@ -2,8 +2,11 @@
 
 	#region using
 	using System.Collections.Generic;
+	using System.IO;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
+	using NAnt.Core.Types;
+
 	#endregion
 
 	[TaskName( "projecttocontent" )]
@@ -13,35 +16,40 @@
 		[StringValidator( AllowEmpty = false )]
 		public string ProjectName { get; set; }
 
-		[TaskAttribute( "delim", Required = false )]
-		[StringValidator( AllowEmpty = true )]
-		public string Delimiter { get; set; }
-
-		[TaskAttribute( "contentproperty", Required = true )]
+		[TaskAttribute( "contentfilesetid", Required = true )]
 		[StringValidator( AllowEmpty = false )]
-		public string ContentProperty { get; set; }
+		public string ContentFilesetRefId { get; set; }
 
 		protected override void ExecuteTask() {
 
-			string delim = this.Delimiter;
-			if ( string.IsNullOrEmpty( delim ) ) {
-				delim = ";";
+			string prop = this.ContentFilesetRefId;
+
+			FileInfo project = new FileInfo( this.ProjectName );
+			if ( !project.Exists ) {
+				throw new BuildException( this.ProjectName + " doesn't exist, can't get the contents of it" );
 			}
-			string prop = this.ContentProperty;
 
-			List<string> content = ProjectHelper.GetProjectContentViaXml( this.ProjectName );
+			List<string> content = ProjectHelper.GetProjectContentViaXml( project );
 
-			string contentString = null;
+			FileSet contentFileset = new FileSet();
+			contentFileset.BaseDirectory = project.Directory;
 			if ( content != null ) {
-				contentString = string.Join( delim, content.ToArray() );
+				foreach ( string file in content ) {
+					contentFileset.Includes.Add( file );
+				}
 			}
 
-			if ( Project.Properties.Contains( prop ) == true ) {
-				Project.Properties[prop] = contentString;
+			this.SetFileSetByRefId( prop, contentFileset );
+
+		}
+
+		private void SetFileSetByRefId( string RefId, FileSet FileSet ) {
+			var refs = this.Project.DataTypeReferences;
+			if ( refs.ContainsKey( RefId ) ) {
+				refs[RefId] = FileSet;
 			} else {
-				Project.Properties.Add( prop, contentString );
+				refs.Add( RefId, FileSet );
 			}
-
 		}
 
 	}

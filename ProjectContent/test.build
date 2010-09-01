@@ -10,11 +10,15 @@
 
 		<property name="ProjectName" value="C:\Users\Rob\Documents\Visual Studio 2008\Projects\Sim\WebGui\WebGui.csproj" />
 
-		<projecttocontent proj="${ProjectName}" delim=";" contentproperty="ContentList" />
-		<foreach item="String" in="${ContentList}" delim=";" property="Content">
+		<projecttocontent proj="${ProjectName}" contentfilesetid="ContentList" />
 
-			<echo message="Content [${Content}]" />
-
+		<foreach item="File" property="Content">
+			<in>
+				<items refid="ContentList" />
+			</in>
+			<do>
+				<echo message="Content: ${Content}" />
+			</do>
 		</foreach>
 
 	</target>

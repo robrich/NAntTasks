@@ -11,19 +11,7 @@ namespace NantProjectContent {
 	#endregion
 
 	public static class ProjectHelper {
-
-		private static void ValidateProjectPath( string ProjectFile ) {
-
-			if ( string.IsNullOrEmpty( ProjectFile ) ) {
-				throw new ArgumentNullException( "ProjectFile" );
-			}
-			FileInfo fi = new FileInfo( ProjectFile );
-			if ( !fi.Exists ) {
-				throw new FileNotFoundException( ProjectFile + " not found", ProjectFile );
-			}
-
-		}
-
+		
 		/*
 		// This method is much more robust, and works fine in a console app, but blows chunks in an NAnt task because VSVersion is null
 		public static List<string> GetProjectContent( string ProjectFile ) {
@@ -47,15 +35,20 @@ namespace NantProjectContent {
 		}
 		*/
 
-		public static List<string> GetProjectContentViaXml( string ProjectFile ) {
+		public static List<string> GetProjectContentViaXml( FileInfo ProjectFile ) {
 
-			ValidateProjectPath( ProjectFile );
+			if ( ProjectFile == null ) {
+				throw new ArgumentNullException( "ProjectFile" );
+			}
+			if ( !ProjectFile.Exists ) {
+				throw new FileNotFoundException( ProjectFile.FullName + " not found", ProjectFile.FullName );
+			}
 
 			List<string> results = new List<string>();
 
-			string path = Path.GetDirectoryName( ProjectFile );
-
-			XDocument doc = XDocument.Load( ProjectFile );
+			string path = ProjectFile.Directory.FullName;
+			
+			XDocument doc = XDocument.Load( ProjectFile.FullName );
 			var items = (
 				from c in doc.Descendants()
 				where c.HasAttributes

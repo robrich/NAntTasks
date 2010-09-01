@@ -6,19 +6,18 @@
 
 	public static class SolutionHelper {
 
-		public static List<string> ParseSolution( string SolutionFilename ) {
+		public static List<string> ParseSolution( FileInfo Solution ) {
 
-			if ( string.IsNullOrEmpty( SolutionFilename ) ) {
-				throw new ArgumentNullException( "SolutionFilename" );
+			if ( Solution == null ) {
+				throw new ArgumentNullException( "Solution" );
 			}
-			FileInfo fi = new FileInfo( SolutionFilename );
-			if ( !fi.Exists ) {
-				throw new FileNotFoundException( SolutionFilename + " not found", SolutionFilename );
+			if ( !Solution.Exists ) {
+				throw new FileNotFoundException( Solution.FullName + " not found", Solution.FullName );
 			}
 
 			List<string> projectPaths = new List<string>();
 
-			string[] text = File.ReadAllLines( fi.FullName );
+			string[] text = File.ReadAllLines( Solution.FullName );
 
 			foreach ( string line in text ) {
 
@@ -49,14 +48,15 @@
 			return projectPaths;
 		}
 
-		public static List<string> FilterProjects( List<string> Projects, bool ExistsOnly, ProjectTypes ProjectType ) {
+		public static List<string> FilterProjects( string BasePath, List<string> Projects, bool ExistsOnly, ProjectTypes ProjectType ) {
 
 			if ( Projects == null || Projects.Count <= 0 ) {
 				return Projects; // You want nothing, you got it.
 			}
 
 			List<string> results = new List<string>();
-			foreach ( string project in Projects ) {
+			foreach ( string projectEntry in Projects ) {
+				string project = Path.Combine( BasePath, projectEntry );
 
 				if ( ExistsOnly ) {
 					try {
@@ -69,6 +69,15 @@
 				}
 				
 				if ( ProjectType != ProjectTypes.All ) {
+					
+					// If it doesn't exist, we can't check it's type
+					try {
+						if ( !File.Exists( project ) ) {
+							continue; // It doesn't
+						}
+					} catch ( Exception ) {
+						continue; // It doesn't exist 'cause the path is bogus
+					}
 
 					string text = File.ReadAllText( project );
 					if ( string.IsNullOrEmpty( text ) ) {

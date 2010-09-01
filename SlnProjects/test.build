@@ -8,16 +8,22 @@
 
 	<target name="Test">
 
-		<property name="Solution" value="C:\Users\Rob\Documents\Visual Studio 2008\Projects\IQZone\src - local2\Server\Server-10.sln" />
+		<property name="Solution" value="C:\Users\Rob\Documents\Visual Studio 2008\Projects\IQZone\src - local2\Server\Server.sln" />
 
-		<slntoprojects sln="${Solution}" delim=";" projectsproperty="ProjectList" />
-		
-		<foreach item="String" in="${ProjectList}" delim=";" property="Project">
-			<property name="ProjectPath" value="${path::get-directory-name(Project)}" />
-			<property name="ProjectName" value="${path::get-file-name(ProjectPath)}" />
+		<slntoprojects sln="${Solution}" projectsfilesetid="ProjectList" />
+		<echo message="reading results" />
 
-			<echo message="Copy [${Project}] from [${ProjectPath}] to [${ProjectName}]"/>
+		<foreach item="File" property="Project">
+			<in>
+				<items refid="ProjectList" />
+			</in>
+			<do>
+				<property name="ProjectFile" value="${path::get-file-name(Project)}" />
+				<property name="ProjectPath" value="${path::get-directory-name(Project)}" />
+				<property name="ProjectName" value="${path::get-file-name(ProjectPath)}" />
 
+				<echo message="Project File [${ProjectFile}] Folder Name [${ProjectName}] Directory [${ProjectPath}]"/>
+			</do>
 		</foreach>
 
 	</target>
