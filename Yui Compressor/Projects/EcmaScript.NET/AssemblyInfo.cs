@@ -19,4 +19,4 @@ using System.Runtime.CompilerServices;
 
 [assembly: AssemblyDescriptionAttribute("Modified version of the EcmaScript.NET assembly.")]
 
-[assembly: CLSCompliant(true)]
+//[assembly: CLSCompliant(true)]

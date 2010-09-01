@@ -21,7 +21,7 @@
     </SccAuxPath>
     <SccProvider>
     </SccProvider>
-    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <FileUpgradeFlags>0</FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation>C:\Users\Rob\Documents\Visual Studio 2008\Projects\NAnt Tasks\Yui Compressor\Backup\</UpgradeBackupLocation>
     <PublishUrl>publish\</PublishUrl>
