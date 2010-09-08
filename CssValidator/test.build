@@ -8,14 +8,16 @@
 
 	<target name="Test">
 
-		<property name="CssFile" value="testit.css" />
-
 		<cssvalidator 
 			javaexe="C:\Program Files (x86)\Java\jre6\bin\java" 
-			file="${CssFile}"
 			profile="css21"
 			errorcountproperty="ValidatorErrorCount"
-			/>
+			verbose="true"
+		>
+			<fileset basedir=".">
+				<include name="testit.css" />
+			</fileset>
+		</cssvalidator>
 			<!--	failonerror="false"
 				verbose="true" /-->
 		<echo message="Errors: ${ValidatorErrorCount}" />
