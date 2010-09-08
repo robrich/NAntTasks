@@ -4,6 +4,7 @@ namespace CssValidator {
 	using System;
 	using System.IO;
 	using System.Reflection;
+	using System.Xml.Linq;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
 	using NAnt.Core.Types;
@@ -66,6 +67,10 @@ namespace CssValidator {
 		[StringValidator( AllowEmpty = true )]
 		public string ErrorCountProperty { get; set; }
 
+		[TaskAttribute( "xmloutputfile", Required = false )]
+		[StringValidator( AllowEmpty = true )]
+		public string XmlOutputFile { get; set; }
+
 		#endregion
 
 		protected override void ExecuteTask() {
@@ -97,7 +102,15 @@ namespace CssValidator {
 			}
 
 			int errorCount = 0;
+			int warningCount = 0;
 
+			XDocument doc = null;
+			XElement root = null;
+			if ( !string.IsNullOrEmpty( this.XmlOutputFile ) ) {
+				doc = new XDocument();
+				root = new XElement( "css-validator" );
+				doc.AddFirst( root );
+			}
 
 			foreach ( string fileToCheck in filesToCheck.FileNames ) {
 				if ( !File.Exists( fileToCheck ) ) {
@@ -105,31 +118,60 @@ namespace CssValidator {
 				}
 				Results results = CssValidatorHelper.ValidateFile( exe, jar, fileToCheck, profile, warning, waitSeconds );
 
-				// TODO: If passed "output as xml", build this output differently
 				if ( this.Verbose ) {
 					if ( !string.IsNullOrEmpty( results.Cmd ) ) {
 						Log( Level.Verbose, results.Cmd );
 					}
 					if ( !string.IsNullOrEmpty( results.StdOut ) ) {
-						Log( Level.Verbose, results.StdOut );
+						// This is just too verbose: Log( Level.Debug, results.StdOut );
 					}
 				}
-				if ( results.Errors != null && results.Errors.Count > 0 ) {
-					foreach ( Error error in results.Errors ) {
-						Log( Level.Error, string.Format( "Error: {0} ({1}): {2}, {3}", fileToCheck, error.Line, error.ErrorDesc, error.Message ) );
+				if ( this.Verbose || string.IsNullOrEmpty( this.XmlOutputFile ) ) {
+					if ( results.Errors != null && results.Errors.Count > 0 ) {
+						foreach ( Error error in results.Errors ) {
+							Log( Level.Error, string.Format( "{0}: {1} ({2}): {3}, {4}", error.ErrorType, fileToCheck, error.Line, error.ErrorDesc, error.Message ) );
+						}
 					}
 				}
-				if ( results.Warnings != null && results.Warnings.Count > 0 ) {
-					foreach ( Error error in results.Warnings ) {
-						Log( Level.Warning, string.Format( "Warning: {0} ({1}): {2}, {3}", fileToCheck, error.Line, error.ErrorDesc, error.Message ) );
+				if ( doc != null ) {
+					XElement element = new XElement(
+						"file",
+						new XAttribute( "name", fileToCheck ),
+						new XAttribute( "errors", results.ErrorCount ),
+						new XAttribute( "warnings", results.WarningCount )
+						);
+					root.Add( element );
+					if ( results.Errors != null && results.Errors.Count > 0 ) {
+						foreach ( Error error in results.Errors ) {
+							element.Add(
+								new XElement(
+									"error",
+									new XAttribute( "line", error.Line ),
+									new XAttribute( "type", error.ErrorType ),
+									new XElement( "description", error.ErrorDesc ),
+									new XElement( "message", error.Message )
+								) );
+						}
+					}
+					if ( this.Verbose ) {
+						element.Add( new XElement( "command", results.Cmd ) );
+						element.Add( new XElement( "stdout", results.StdOut ) );
 					}
 				}
 
 				errorCount += results.ErrorCount;
+				warningCount += results.WarningCount;
 				if ( !results.Success && results.ErrorCount < 1 ) {
 					errorCount++; // To insure the build fails correctly
 				}
 
+			}
+
+			if ( doc != null ) {
+				root.Add( new XAttribute( "success", ( errorCount == 0 ) ) );
+				root.Add( new XAttribute( "totalErrors", errorCount ) );
+				root.Add( new XAttribute( "totalWarnings", warningCount ) );
+				doc.Save( this.XmlOutputFile );
 			}
 
 			if ( this.FailOnError ) {

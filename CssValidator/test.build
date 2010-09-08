@@ -12,6 +12,7 @@
 			javaexe="C:\Program Files (x86)\Java\jre6\bin\java" 
 			profile="css21"
 			errorcountproperty="ValidatorErrorCount"
+			xmloutputfile="test.log"
 			verbose="true"
 		>
 			<fileset basedir=".">

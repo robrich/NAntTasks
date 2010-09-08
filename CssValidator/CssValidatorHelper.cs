@@ -139,6 +139,7 @@ namespace CssValidator {
 				from e in doc.Descendants()
 				where e.Name.LocalName == "error"
 				select new Error {
+					ErrorType = ErrorType.Error,
 					Line = int.Parse(
 						(
 							from d in e.Descendants()
@@ -163,7 +164,7 @@ namespace CssValidator {
 									select d.Value
 									).First(), " [ ]+", " ", RegexOptions.Multiline ),
 							"(?:^ +| +$)", "", RegexOptions.Multiline ),
-						"\n[ ]*$", "", RegexOptions.Singleline )
+						"(?:^(?:\n[ ]*)+)|(?:(?:\n[ ]*)+$)", "", RegexOptions.Singleline )
 						.Replace( "\n\n", "\n" ).Replace( "\n", ", " ).Trim()
 				}
 				).ToList();
@@ -172,6 +173,7 @@ namespace CssValidator {
 				from e in doc.Descendants()
 				where e.Name.LocalName == "warning"
 				select new Error {
+					ErrorType = ErrorType.Warning,
 					Line = int.Parse(
 						(
 							from d in e.Descendants()
@@ -213,12 +215,13 @@ namespace CssValidator {
 				errorCount = -1;
 			}
 
+			errorList.AddRange(warningList);
+			
 			return new Results {
 				Success = worked,
 				ErrorCount = errorCount,
 				WarningCount = warningCount,
 				Errors = errorList,
-				Warnings = warningList,
 				StdOut = stdout
 			};
 		}
@@ -231,7 +234,6 @@ namespace CssValidator {
 		public int ErrorCount { get; set; }
 		public int WarningCount { get; set; }
 		public List<Error> Errors { get; set; }
-		public List<Error> Warnings { get; set; }
 
 		public string StdOut { get; set; }
 		public string Cmd { get; set; }
@@ -241,6 +243,11 @@ namespace CssValidator {
 		public int Line { get; set; }
 		public string ErrorDesc { get; set; }
 		public string Message { get; set; }
+		public ErrorType ErrorType { get; set; }
+	}
+	internal enum ErrorType {
+		Error,
+		Warning
 	}
 
 }
