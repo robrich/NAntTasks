@@ -10,7 +10,7 @@
 
 		<property name="Solution" value="C:\Users\Rob\Documents\Visual Studio 2008\Projects\IQZone\src - local2\Server\Server.sln" />
 
-		<slntoprojects sln="${Solution}" projectsfilesetid="ProjectList" />
+		<slntoprojects sln="${Solution}" id="ProjectList" />
 		<echo message="reading results" />
 
 		<foreach item="File" property="Project">

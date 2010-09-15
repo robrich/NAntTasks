@@ -4,6 +4,7 @@ namespace NAntSlnToProjects {
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
+	using System.Reflection;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
 	using NAnt.Core.Types;
@@ -11,7 +12,39 @@ namespace NAntSlnToProjects {
 	#endregion
 
 	[TaskName( "slntoprojects" )]
-	public class SlnToProjects : Task {
+	public class SlnToProjects : FileSet {
+
+		private FieldInfo scannerField = null;
+		private FieldInfo hasScannedField = null;
+
+		public SlnToProjects()
+			: base() {
+			this.Init();
+		}
+
+		public SlnToProjects( FileSet fs )
+			: base( fs ) {
+			this.Init();
+		}
+
+		private void Init() {
+			hasScannedField = GetField( typeof( FileSet ), "_hasScanned", typeof( bool ) );
+			scannerField = GetField( typeof( FileSet ), "_scanner", typeof( DirectoryScanner ) );
+		}
+
+		#region private fields in FileSet that we reflect into
+
+		protected DirectoryScanner scanner {
+			get { return (DirectoryScanner)scannerField.GetValue( this ); }
+			set { scannerField.SetValue( this, value ); }
+		}
+
+		protected bool hasScanned {
+			get { return (bool)hasScannedField.GetValue( this ); }
+			set { hasScannedField.SetValue( this, value ); }
+		}
+
+		#endregion
 
 		[TaskAttribute( "sln", Required = true )]
 		[StringValidator( AllowEmpty = false )]
@@ -29,13 +62,31 @@ namespace NAntSlnToProjects {
 		[StringValidator( AllowEmpty = true )]
 		public bool ExistsOnly { get; set; }
 
-		[TaskAttribute( "projectsfilesetid", Required = true )]
-		[StringValidator( AllowEmpty = false )]
-		public string ProjectsFilesetRefId { get; set; }
+		#region FileSet properties that don't work here
 
-		protected override void ExecuteTask() {
+		[Obsolete( "<slntoprojects ... /> is not used in this way.", true )]
+		[TaskAttribute( "basedir" )]
+		public virtual DirectoryInfo basedirBlock { get; set; }
 
-			string prop = this.ProjectsFilesetRefId;
+		[Obsolete( "<slntoprojects ... /> is not used in this way.", true )]
+		[BuildElementArray( "exclude" )]
+		public Exclude[] excludeBlock { get; set; }
+
+		[Obsolete( "<slntoprojects ... /> is not used in this way.", true )]
+		[BuildElementArray( "excludesfile" )]
+		public ExcludesFile[] excludesFileBlock { get; set; }
+
+		[Obsolete( "<slntoprojects ... /> is not used in this way.", true )]
+		[BuildElementArray( "include" )]
+		public Include[] includeBlock { get; set; }
+
+		[Obsolete( "<slntoprojects ... /> is not used in this way.", true )]
+		[BuildElementArray( "includesfile" )]
+		public IncludesFile[] includesFileBlock { get; set; }
+
+		#endregion
+
+		public override void Scan() {
 
 			ProjectTypes projectType = ProjectTypes.Endpoint;
 			if ( !string.IsNullOrEmpty( this.ProjectType ) ) {
@@ -48,30 +99,37 @@ namespace NAntSlnToProjects {
 				throw new BuildException( this.SolutionName + " doesn't exist, can't get the contents of it" );
 			}
 
+			this.BaseDirectory = sln.Directory;
+
 			List<string> projects = SolutionHelper.ParseSolution( sln );
 
 			projects = SolutionHelper.FilterProjects( sln.DirectoryName, projects, this.ExistsOnly, projectType );
 
-			FileSet projectsFileset = new FileSet();
-			projectsFileset.BaseDirectory = sln.Directory;
 			if ( projects != null ) {
-				foreach ( string file in projects ) {
-					projectsFileset.Includes.Add( file );
+				DirectoryScanner scanner = this.scanner; // Avoid re-reflecting every time
+				foreach ( string filename in projects ) {
+					scanner.FileNames.Add( filename );
 				}
 			}
-
-			this.SetFileSetByRefId( prop, projectsFileset );
-
-		}
-
-		private void SetFileSetByRefId( string RefId, FileSet FileSet ) {
-			var refs = this.Project.DataTypeReferences;
-			if ( refs.ContainsKey( RefId ) ) {
-				refs[RefId] = FileSet;
-			} else {
-				refs.Add( RefId, FileSet );
+			this.hasScanned = true;
+			
+			if ( this.FailOnEmpty && ( this.scanner.FileNames.Count == 0 ) ) {
+				throw new ValidationException( "No matching files when filtering in " + this.BaseDirectory, this.Location );
 			}
 		}
+
+		#region GetField (Reflection)
+		private static FieldInfo GetField( Type BaseType, string FieldName, Type FieldType ) {
+			var field = BaseType.GetField( FieldName, BindingFlags.Default | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy );
+			if ( field == null ) {
+				throw new ArgumentNullException( FieldName, "Can't find private field " + FieldName );
+			}
+			if ( field.FieldType != FieldType ) {
+				throw new ArgumentNullException( FieldName, "Found the field " + FieldName + ", but it isn't a " + FieldType.FullName + ", it's a " + field.FieldType.FullName );
+			}
+			return field;
+		}
+		#endregion
 
 	}
 

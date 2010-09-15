@@ -10,7 +10,7 @@
 
 		<property name="ProjectName" value="C:\Users\Rob\Documents\Visual Studio 2008\Projects\Sim\WebGui\WebGui.csproj" />
 
-		<projecttocontent proj="${ProjectName}" contentfilesetid="ContentList" />
+		<projecttocontent proj="${ProjectName}" id="ContentList" />
 
 		<foreach item="File" property="Content">
 			<in>
