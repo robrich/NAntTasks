@@ -1,0 +1,21 @@
+﻿Seemed unnecessary:
+
+<restrict cache="true|false" /> (since it's only scanned once, right?)
+
+<restrict>
+	<type type="file|dir|any" /> since we're looping through resolved filenames, not <include />|<exclude /> masks
+	<instanceof /> since we're only dealing with filenames, and not instanciating their contents
+	<size> it's the size of the containing collection, seems pointless
+	<compare> what does this do?
+
+</restrict>
+
+
+Additional Filters Added:
+
+<restrict>
+	<filesize> what I thought size was until I looked closer
+	<read-only />
+	<contains (string=""|regex="") /> Examine file contents for matching line
+
+</restrict>
