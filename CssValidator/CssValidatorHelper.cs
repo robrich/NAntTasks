@@ -230,6 +230,11 @@ namespace CssValidator {
 	}
 
 	internal class Results {
+
+		public Results() {
+			this.Errors = new List<ErrorItem>();
+		}
+
 		public bool Success { get; set; }
 		public int ErrorCount { get; set; }
 		public int WarningCount { get; set; }

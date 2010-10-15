@@ -174,10 +174,8 @@ namespace CssValidator {
 				doc.Save( this.XmlOutputFile );
 			}
 
-			if ( this.FailOnError ) {
-				if ( errorCount > 0 ) {
-					throw new BuildException( string.Format( "Errors found in css files: ", errorCount ) );
-				}
+			if ( this.FailOnError && errorCount > 0 ) {
+				throw new BuildException( "Errors found in css files: " + errorCount );
 			}
 
 			if ( Project.Properties.Contains( prop ) ) {
