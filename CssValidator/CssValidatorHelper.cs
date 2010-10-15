@@ -232,7 +232,7 @@ namespace CssValidator {
 	internal class Results {
 
 		public Results() {
-			this.Errors = new List<ErrorItem>();
+			this.Errors = new List<Error>();
 		}
 
 		public bool Success { get; set; }
