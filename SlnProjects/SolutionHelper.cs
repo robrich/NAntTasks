@@ -28,6 +28,7 @@
 				if ( !line.StartsWith( "Project(\"{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC" ) // C#
 					&& !line.StartsWith( "Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\")" ) // C++
 					&& !line.StartsWith( "Project(\"{F184B08F-C81C-45F6-A57F-5ABD9991F28F}\")" ) // VB
+					&& !line.StartsWith( "Project(\"{C8D11400-126E-41CD-887F-60BD40844F9E}\")" ) // Database
 					) {
 					continue;
 				}
@@ -89,7 +90,7 @@
 						|| ( text.IndexOf( "<ConfigurationType>Application</ConfigurationType>", StringComparison.InvariantCultureIgnoreCase ) > -1 );
 					bool web = ( text.IndexOf( "<Content Include=\"Web.config\"", StringComparison.InvariantCultureIgnoreCase ) > -1 )
 								|| ( text.IndexOf( "{349c5851-65df-11da-9384-00065b846f21}", StringComparison.InvariantCultureIgnoreCase ) > -1 ); // Web Application Project
-					bool database = ( text.IndexOf( "<Import Project=\"$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v10.0\\TeamData\\Microsoft.Data.Schema.SqlTasks.targets\" />", StringComparison.InvariantCultureIgnoreCase ) > -1 )
+					bool database = ( text.IndexOf( "\"$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v10.0\\TeamData\\Microsoft.Data.Schema.SqlTasks.targets\"", StringComparison.InvariantCultureIgnoreCase ) > -1 )
 								|| ( text.IndexOf( "{349c5851-65df-11da-9384-00065b846f21}", StringComparison.InvariantCultureIgnoreCase ) > -1 ); //Database Project
 
 					bool test = ( text.IndexOf( "<Reference Include=\"nunit.framework", StringComparison.InvariantCultureIgnoreCase ) > -1 );
