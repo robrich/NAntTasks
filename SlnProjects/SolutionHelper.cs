@@ -89,16 +89,21 @@
 						|| ( text.IndexOf( "<ConfigurationType>Application</ConfigurationType>", StringComparison.InvariantCultureIgnoreCase ) > -1 );
 					bool web = ( text.IndexOf( "<Content Include=\"Web.config\"", StringComparison.InvariantCultureIgnoreCase ) > -1 )
 								|| ( text.IndexOf( "{349c5851-65df-11da-9384-00065b846f21}", StringComparison.InvariantCultureIgnoreCase ) > -1 ); // Web Application Project
+					bool database = ( text.IndexOf( "<Import Project=\"$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v10.0\\TeamData\\Microsoft.Data.Schema.SqlTasks.targets\" />", StringComparison.InvariantCultureIgnoreCase ) > -1 )
+								|| ( text.IndexOf( "{349c5851-65df-11da-9384-00065b846f21}", StringComparison.InvariantCultureIgnoreCase ) > -1 ); //Database Project
+
 					bool test = ( text.IndexOf( "<Reference Include=\"nunit.framework", StringComparison.InvariantCultureIgnoreCase ) > -1 );
 
 					switch ( ProjectType ) {
 						case ProjectTypes.All: break; // Everything is fine
 							
-						case ProjectTypes.Endpoint: if ( !app && !web && !test ) { continue; } break;
+						case ProjectTypes.Endpoint: if ( !app && !web && !test && !database ) { continue; } break;
 
 						case ProjectTypes.Web: if ( !web ) { continue; } break;
 
 						case ProjectTypes.App: if ( !app ) { continue; } break;
+
+						case ProjectTypes.Database: if ( !database ) { continue; } break;
 
 						case ProjectTypes.Test: if ( !test ) { continue; } break;
 
@@ -122,6 +127,7 @@
 		Endpoint,
 		Web,
 		App,
+		Database,
 		Test
 	}
 

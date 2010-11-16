@@ -56,7 +56,7 @@ namespace NAntSlnToProjects {
 		[TaskAttribute( "type", Required = false )]
 		[StringValidator( AllowEmpty = true )]
 		public string ProjectType { get; set; }
-		// "all", "endpoint", "web", "app", "test"
+		// "all", "endpoint", "web", "app", database, "test"
 
 		[TaskAttribute( "existsonly", Required = false )]
 		[StringValidator( AllowEmpty = true )]
