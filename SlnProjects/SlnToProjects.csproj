@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NAntSlnToProjects</RootNamespace>
-    <AssemblyName>SlnToProjects.Tasks</AssemblyName>
+    <AssemblyName>NAnt.SlnToProjects.Tasks</AssemblyName>
     <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
