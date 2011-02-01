@@ -33,7 +33,7 @@ namespace NAnt.SqlRunner.Tasks {
 		public string ConnectionStringName { get; set; }
 
 		// ExecuteScalar, ExecuteReader, ExecuteNonQuery
-		[BuildElement( "execute-type", Required = false )]
+		[TaskAttribute( "execute-type", Required = false )]
 		[StringValidator( AllowEmpty = true )]
 		public ExecuteType ExecuteType { get; set; }
 
@@ -56,7 +56,7 @@ namespace NAnt.SqlRunner.Tasks {
 		protected override void ExecuteTask() {
 
 			if ( !Enum.IsDefined( typeof( ExecuteType ), this.ExecuteType ) ) {
-				throw new BuildException( "ExecuteType isn't a valid Enum value" );
+				throw new BuildException( this.ExecuteType + " isn't a valid execution-type: " + string.Join( ", ", Enum.GetNames( typeof( ExecuteType ) ) ) );
 			}
 
 			if ( string.IsNullOrEmpty( SqlCommand ) ) {
