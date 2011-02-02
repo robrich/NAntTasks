@@ -88,6 +88,7 @@ namespace NAntSlnToProjects {
 					}
 
 					bool app = ( text.IndexOf( "<OutputType>Exe</OutputType>", StringComparison.InvariantCultureIgnoreCase ) > -1 )
+						|| ( text.IndexOf( "<OutputType>WinExe</OutputType>", StringComparison.InvariantCultureIgnoreCase ) > -1 )
 						|| ( text.IndexOf( "<ConfigurationType>Application</ConfigurationType>", StringComparison.InvariantCultureIgnoreCase ) > -1 );
 					bool web = ( text.IndexOf( "<Content Include=\"Web.config\"", StringComparison.InvariantCultureIgnoreCase ) > -1 )
 								|| ( text.IndexOf( "{349c5851-65df-11da-9384-00065b846f21}", StringComparison.InvariantCultureIgnoreCase ) > -1 ); // Web Application Project
