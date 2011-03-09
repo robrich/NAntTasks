@@ -229,6 +229,29 @@ namespace NAnt.Restrict.Tests {
 
 		}
 
+		[Test]
+		public void BaseDirIsFilesBaseDir() {
+
+			// Arrange
+			List<FilterBase> filters = new List<FilterBase>() {
+				new MockFilter( false )
+			};
+
+			string filename = "";
+			FileSet fs = new FileSet();
+			fs.BaseDirectory = new DirectoryInfo( Path.GetDirectoryName( Assembly.GetExecutingAssembly().GetName().CodeBase.Substring( 8 ) ) ); // Get past file://
+			fs.FileNames.Add( filename );
+
+			Restrict restrict = new Restrict( filters, fs );
+
+			// Act
+			// Nothing to do, it should be set already
+
+			// Assert
+			Assert.AreEqual( restrict.BaseDirectory, fs.BaseDirectory );
+			
+		}
+
 	}
 
 }

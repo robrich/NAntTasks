@@ -4,12 +4,30 @@
 
 	<property name="nant.settings.currentframework" value="net-3.5" overwrite="false" />
 
-	<loadtasks assembly="bin/Debug/NAnt.Restrict.dll" />
+	<loadtasks assembly="bin/Debug/NAnt.Restrict.Tasks.dll" />
 
 	<target name="Test">
 
-		<restrict id="bindir">
+		<echo message="All dir" />
+		<restrict id="alldir">
 			<fileset basedir=".">
+				<include name="**/**" />
+			</fileset>
+			<exists />
+		</restrict>
+
+		<foreach item="File" property="File">
+			<in>
+				<items refid="alldir" />
+			</in>
+			<do>
+				<echo message="Exists ${file::exists(File)}: ${File}" />
+			</do>
+		</foreach>
+
+		<echo message="bin dir" />
+		<restrict id="bindir">
+			<fileset basedir="bin">
 				<include name="**/**" />
 			</fileset>
 			<exists />
@@ -20,7 +38,7 @@
 				<items refid="bindir" />
 			</in>
 			<do>
-				<echo message="File: ${File}" />
+				<echo message="Exists ${file::exists(File)}: ${File}" />
 			</do>
 		</foreach>
 

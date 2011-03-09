@@ -42,7 +42,7 @@ namespace NAnt.Restrict.Filters {
 		/// <summary>
 		/// If this is specified, the mapper will treat a \ character in the filename as a / for the purposes of matching
 		/// </summary>
-		[TaskAttribute( "name", Required = false )]
+		[TaskAttribute( "handledirsep", Required = false )]
 		public bool HandleDirSep { get; set; }
 
 		public override FilterPriority Priority {

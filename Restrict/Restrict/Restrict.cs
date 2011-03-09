@@ -1,4 +1,4 @@
-﻿namespace NAnt.Restrict {
+namespace NAnt.Restrict {
 
 	#region using
 	using System;
@@ -131,9 +131,12 @@
 
 		#region FileSet properties that don't work here
 
-		[Obsolete( "<restrict ... /> is not used in this way.", true )]
+		[Obsolete( "<restrict ... /> is not used in this way.", true )] // TODO: How to attribute NAn't use of it while allowing it for code?
 		[TaskAttribute( "basedir" )]
-		public virtual DirectoryInfo basedirBlock { get; set; }
+		public override DirectoryInfo BaseDirectory {
+			get { return this.Files.BaseDirectory; }
+			set { /* ignore */ }
+		}
 
 		[Obsolete( "<restrict ... /> is not used in this way.", true )]
 		[BuildElementArray( "exclude" )]
@@ -156,6 +159,9 @@
 		#region Scan
 		public override void Scan() {
 
+			if ( this.Files == null ) {
+				throw new BuildException( "<fileset .../> is not defined." );
+			}
 			if ( this.filters.Count == 0 ) {
 				throw new BuildException( "<restrict .../> has no filters defined." );
 			}
@@ -170,8 +176,6 @@
 
 			DirectoryScanner scanner = this.scanner; // Avoid re-reflecting every time
 			try {
-				this.BaseDirectory = this.Files.BaseDirectory;
-
 				StringEnumerator fileEnumerator = this.Files.FileNames.GetEnumerator();
 				while ( fileEnumerator.MoveNext() ) {
 					string filename = fileEnumerator.Current;
