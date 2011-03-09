@@ -30,6 +30,7 @@ namespace NantProjectContent {
 		private void Init() {
 			hasScannedField = GetField( typeof( FileSet ), "_hasScanned", typeof( bool ) );
 			scannerField = GetField( typeof( FileSet ), "_scanner", typeof( DirectoryScanner ) );
+			this.Verbose = false;
 		}
 
 		#region private fields in FileSet that we reflect into
@@ -48,9 +49,9 @@ namespace NantProjectContent {
 
 		#region FileSet properties that don't work here
 
-		[Obsolete( "<projecttocontent ... /> is not used in this way.", true )]
+		[Obsolete( "<projecttocontent ... /> is not used in this way.", true )] // TODO: How to block NAn't use of it while allowing it for code?
 		[TaskAttribute( "basedir" )]
-		public virtual DirectoryInfo basedirBlock { get; set; }
+		public override DirectoryInfo BaseDirectory { get; set; }
 
 		[Obsolete( "<projecttocontent ... /> is not used in this way.", true )]
 		[BuildElementArray( "exclude" )]
@@ -74,9 +75,15 @@ namespace NantProjectContent {
 		[StringValidator( AllowEmpty = false )]
 		public string ProjectName { get; set; }
 
+		[TaskAttribute( "verbose", Required = false )]
+		public bool Verbose { get; set; }
+
 		public override void Scan() {
 
 			FileInfo project = new FileInfo( this.ProjectName );
+			if ( this.Verbose ) {
+				this.Log( Level.Info, "Scanning for content in " + this.ProjectName );
+			}
 			if ( !project.Exists ) {
 				throw new BuildException( this.ProjectName + " doesn't exist, can't get the contents of it" );
 			}
@@ -88,6 +95,9 @@ namespace NantProjectContent {
 			DirectoryScanner scanner = this.scanner; // Avoid re-reflecting every time
 			foreach ( string filename in content ) {
 				scanner.FileNames.Add( filename );
+				if ( this.Verbose ) {
+					this.Log( Level.Info, filename );
+				}
 			}
 			this.hasScanned = true;
 

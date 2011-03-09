@@ -52,6 +52,7 @@ namespace NAnt.Restrict {
 		private void Init() {
 			hasScannedField = GetField( typeof( FileSet ), typeof( bool ), "_hasScanned" );
 			scannerField = GetField( typeof( FileSet ), typeof( DirectoryScanner ), "_scanner" );
+			this.Verbose = false;
 		}
 
 		#region FileSet fields that we reflect into
@@ -69,6 +70,9 @@ namespace NAnt.Restrict {
 
 		[BuildElement( "fileset", Required = true )]
 		public FileSet Files { get; set; }
+
+		[TaskAttribute( "verbose", Required = false )]
+		public bool Verbose { get; set; }
 
 		#region Add*Filter for each filter type ('cause a generic FilterBase doesn't seem to work)
 
@@ -131,7 +135,7 @@ namespace NAnt.Restrict {
 
 		#region FileSet properties that don't work here
 
-		[Obsolete( "<restrict ... /> is not used in this way.", true )] // TODO: How to attribute NAn't use of it while allowing it for code?
+		[Obsolete( "<restrict ... /> is not used in this way.", true )] // TODO: How to block NAn't use of it while allowing it for code?
 		[TaskAttribute( "basedir" )]
 		public override DirectoryInfo BaseDirectory {
 			get { return this.Files.BaseDirectory; }
@@ -190,12 +194,18 @@ namespace NAnt.Restrict {
 						if ( !filter.Filter( fi ) ) {
 							// This filter said not to use it
 							passed = false;
+							if ( this.Verbose ) {
+								this.Log( Level.Info, "failed by " + filter.Name + ": " + filename );
+							}
 							continue;
 						}
 					}
 
 					if ( passed ) {
 						scanner.FileNames.Add( filename );
+						if ( this.Verbose ) {
+							this.Log( Level.Info, "passed: " + filename );
+						}
 					}
 				}
 
