@@ -177,6 +177,9 @@ namespace NAnt.Restrict {
 					nested.NestedInitialize();
 				}
 			}
+			if ( this.Verbose ) {
+				this.Log( Level.Info, "basedir: " + this.BaseDirectory );
+			}
 
 			DirectoryScanner scanner = this.scanner; // Avoid re-reflecting every time
 			try {

@@ -89,6 +89,9 @@ namespace NantProjectContent {
 			}
 
 			this.BaseDirectory = project.Directory;
+			if ( this.Verbose ) {
+				this.Log( Level.Info, "basedir: " + this.BaseDirectory );
+			}
 
 			List<string> content = ProjectHelper.GetProjectContentViaXml( project );
 
