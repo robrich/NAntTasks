@@ -10,7 +10,35 @@
 	<property name="MSBuildXmlLoggerPath" value="C:\ci\CruiseControl.NET\server\ThoughtWorks.CruiseControl.MsBuild.dll" />
 
 
-	<target name="Build_Release" depends="Release,Clean,RevertVersion,Build" />
+	<target name="Build_Release" depends="Release,Clean,RevertVersion,Build,CopyWeird" />
+	<target name="CopyWeird">
+		<!-- FRAGILE: This assumes we've got them all -->
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/ProjectContent">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>	
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/Restrict/Restrict">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>	
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/SlnProjects">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>	
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/SqlRunner/SqlRunner">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>	
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/Yui Compressor/Projects/Yahoo.Yui.Compressor/Model">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>
+	</target>
 
 
 	<!-- Select the configuration: Debug or Release -->
