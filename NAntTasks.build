@@ -66,9 +66,11 @@
 				<include name="*results.xml" /><!-- NUnit results -->
 				<include name="*msbuild.xml" /><!-- MSBuild results -->
 				<include name="build/**" />
+				<include name="log/**" />
 			</fileset>
 		</delete>
 		<delete dir="build" if="${directory::exists('build')}" />
+		<delete dir="log" if="${directory::exists('log')}" />
 	</target>
 
 
@@ -177,8 +179,9 @@
 		<property name="MSBuildLogger" value="" />
 		<property name="MSBuildConsoleLogger" value="" />
 		<if test="${file::exists(MSBuildXmlLoggerPath)}">
-			<property name="MSBuildLogger" value="/l:ThoughtWorks.CruiseControl.MsBuild.XmlLogger,${MSBuildXmlLoggerPath};${SolutionName}-${Platform}.msbuild.xml" />
+			<property name="MSBuildLogger" value="/l:ThoughtWorks.CruiseControl.MsBuild.XmlLogger,${MSBuildXmlLoggerPath};log\${Solution}-${PlatformNoSpace}.msbuild.xml" />
 			<property name="MSBuildConsoleLogger" value="/noconsolelogger" />
+			<mkdir dir="log" if="${not(directory::exists('log'))}" />
 		</if>
 
 		<echo message="Building ${Solution} for ${Platform}: ${nant.settings.currentframework} ${Configuration} ${DebugConditional}"/>
