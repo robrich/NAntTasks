@@ -135,11 +135,17 @@ namespace NAnt.Restrict {
 
 		#region FileSet properties that don't work here
 
-		[Obsolete( "<restrict ... /> is not used in this way.", true )] // TODO: How to block NAn't use of it while allowing it for code?
 		[TaskAttribute( "basedir" )]
 		public override DirectoryInfo BaseDirectory {
-			get { return this.Files.BaseDirectory; }
-			set { /* ignore */ }
+			get {
+				if ( !this.hasScanned ) {
+					this.Scan();
+				}
+				return baseDirectory;
+			}
+			set {
+				throw new BuildException( "<projectcontent ... /> can't set basedir." );
+			}
 		}
 
 		[Obsolete( "<restrict ... /> is not used in this way.", true )]
@@ -159,15 +165,19 @@ namespace NAnt.Restrict {
 		public IncludesFile[] includesFileBlock { get; set; }
 
 		#endregion
+		
+		private DirectoryInfo baseDirectory {
+			get { return this.Files.BaseDirectory; }
+		}
 
 		#region Scan
 		public override void Scan() {
 
 			if ( this.Files == null ) {
-				throw new BuildException( "<fileset .../> is not defined." );
+				throw new BuildException( " [restrict] <fileset .../> is not defined." );
 			}
 			if ( this.filters.Count == 0 ) {
-				throw new BuildException( "<restrict .../> has no filters defined." );
+				throw new BuildException( " [restrict] no filters defined." );
 			}
 			this.filters.Sort( ( a, b ) => ( (int)a.Priority ).CompareTo( (int)b.Priority ) );
 
@@ -178,7 +188,7 @@ namespace NAnt.Restrict {
 				}
 			}
 			if ( this.Verbose ) {
-				this.Log( Level.Info, "basedir: " + this.BaseDirectory );
+				this.Log( Level.Info, " [restrict] basedir: " + this.baseDirectory );
 			}
 
 			DirectoryScanner scanner = this.scanner; // Avoid re-reflecting every time
@@ -198,7 +208,7 @@ namespace NAnt.Restrict {
 							// This filter said not to use it
 							passed = false;
 							if ( this.Verbose ) {
-								this.Log( Level.Info, "failed by " + filter.Name + ": " + filename );
+								this.Log( Level.Info, " [restrict] failed by " + filter.Description() + ": " + filename );
 							}
 							continue;
 						}
@@ -207,17 +217,17 @@ namespace NAnt.Restrict {
 					if ( passed ) {
 						scanner.FileNames.Add( filename );
 						if ( this.Verbose ) {
-							this.Log( Level.Info, "passed: " + filename );
+							this.Log( Level.Info, " [restrict] passed: " + filename );
 						}
 					}
 				}
 
 				this.hasScanned = true;
 			} catch ( Exception ex ) {
-				throw new BuildException( "Error building restricted results", this.Location, ex );
+				throw new BuildException( " [restrict] Error building restricted results", this.Location, ex );
 			}
 			if ( this.FailOnEmpty && ( this.scanner.FileNames.Count == 0 ) ) {
-				throw new ValidationException( "No matching files when filtering in " + this.BaseDirectory, this.Location );
+				throw new ValidationException( " [restrict] No matching files when filtering in " + this.baseDirectory.FullName, this.Location );
 			}
 		}
 		#endregion

@@ -3,6 +3,7 @@ namespace NAnt.Restrict.Filters {
 	#region using
 	using System;
 	using System.IO;
+	using System.Text;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
 	using NAnt.Restrict.Helpers;
@@ -34,6 +35,15 @@ namespace NAnt.Restrict.Filters {
 
 		public override FilterPriority Priority {
 			get { return FilterPriority.File; }
+		}
+
+		public override string Description() {
+			StringBuilder sb = new StringBuilder();
+			sb.Append( "<filesize " );
+			this.AddParameter( sb, "size", this.SizeInK );
+			this.AddParameter( sb, "when", this.When );
+			sb.Append( "/>" );
+			return sb.ToString();
 		}
 
 		public override bool Filter( IFileInfo File ) {

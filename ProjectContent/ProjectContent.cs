@@ -49,9 +49,18 @@ namespace NantProjectContent {
 
 		#region FileSet properties that don't work here
 
-		[Obsolete( "<projecttocontent ... /> is not used in this way.", true )] // TODO: How to block NAn't use of it while allowing it for code?
 		[TaskAttribute( "basedir" )]
-		public override DirectoryInfo BaseDirectory { get; set; }
+		public override DirectoryInfo BaseDirectory {
+			get {
+				if ( !this.hasScanned ) {
+					this.Scan();
+				}
+				return baseDirectory;
+			}
+			set {
+				throw new BuildException( "<projectcontent ... /> can't set basedir." );
+			}
+		}
 
 		[Obsolete( "<projecttocontent ... /> is not used in this way.", true )]
 		[BuildElementArray( "exclude" )]
@@ -78,35 +87,37 @@ namespace NantProjectContent {
 		[TaskAttribute( "verbose", Required = false )]
 		public bool Verbose { get; set; }
 
+		private DirectoryInfo baseDirectory { get; set; }
+
 		public override void Scan() {
 
 			FileInfo project = new FileInfo( this.ProjectName );
 			if ( this.Verbose ) {
-				this.Log( Level.Info, "Scanning for content in " + this.ProjectName );
+				this.Log( Level.Info, "[projecttocontent] Scanning for content in " + this.ProjectName );
 			}
 			if ( !project.Exists ) {
-				throw new BuildException( this.ProjectName + " doesn't exist, can't get the contents of it" );
+				throw new BuildException( "[projecttocontent] " + this.ProjectName + " doesn't exist, can't get the contents of it" );
 			}
 
-			this.BaseDirectory = project.Directory;
+			this.baseDirectory = project.Directory;
 			if ( this.Verbose ) {
-				this.Log( Level.Info, "basedir: " + this.BaseDirectory );
+				this.Log( Level.Info, "[projecttocontent] basedir: " + this.baseDirectory.FullName );
 			}
 
 			List<string> content = ProjectHelper.GetProjectContentViaXml( project );
 
 			DirectoryScanner scanner = this.scanner; // Avoid re-reflecting every time
 			foreach ( string filename in content ) {
-				string filepath = Path.Combine( this.BaseDirectory.FullName, filename );
+				string filepath = Path.Combine( this.baseDirectory.FullName, filename );
 				scanner.FileNames.Add( filepath );
 				if ( this.Verbose ) {
-					this.Log( Level.Info, filepath );
+					this.Log( Level.Info, "[projecttocontent] adding "+filepath );
 				}
 			}
 			this.hasScanned = true;
 
 			if ( this.FailOnEmpty && ( this.scanner.FileNames.Count == 0 ) ) {
-				throw new ValidationException( "No matching files when filtering in " + this.BaseDirectory, this.Location );
+				throw new ValidationException( "[projecttocontent] No matching files when filtering in " + this.baseDirectory.FullName, this.Location );
 			}
 		}
 

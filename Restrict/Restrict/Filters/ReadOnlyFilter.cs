@@ -17,6 +17,10 @@ namespace NAnt.Restrict.Filters {
 			get { return FilterPriority.File; }
 		}
 
+		public override string Description() {
+			return "<readonly />";
+		}
+
 		public override bool Filter( IFileInfo File ) {
 			if ( !File.Exists ) {
 				return false; // It can't be read-only if it doesn't exist

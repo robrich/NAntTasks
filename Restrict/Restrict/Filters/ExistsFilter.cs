@@ -17,6 +17,10 @@ namespace NAnt.Restrict.Filters {
 			get { return FilterPriority.File; }
 		}
 
+		public override string Description() {
+			return "<exists />";
+		}
+
 		public override bool Filter( IFileInfo File ) {
 			return File.Exists;
 		}

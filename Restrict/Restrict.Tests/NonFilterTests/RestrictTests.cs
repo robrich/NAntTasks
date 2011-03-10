@@ -182,7 +182,7 @@ namespace NAnt.Restrict.Tests {
 				// Assert
 				Assert.Fail( "No filters didn't throw" );
 			} catch ( BuildException ex ) {
-				if ( !ex.Message.Contains( "has no filters" ) ) {
+				if ( !ex.Message.Contains( "no filters" ) ) {
 					throw;
 				}
 				// It worked
@@ -237,7 +237,7 @@ namespace NAnt.Restrict.Tests {
 				new MockFilter( false )
 			};
 
-			string filename = "";
+			string filename = "somefile";
 			FileSet fs = new FileSet();
 			fs.BaseDirectory = new DirectoryInfo( Path.GetDirectoryName( Assembly.GetExecutingAssembly().GetName().CodeBase.Substring( 8 ) ) ); // Get past file://
 			fs.FileNames.Add( filename );

@@ -18,6 +18,10 @@ namespace NAnt.Restrict.Tests {
 			get { return FilterPriority.File; }
 		}
 
+		public override string Description() {
+			return "<mock />";
+		}
+
 		public override bool Filter( IFileInfo File ) {
 			return this.state;
 		}

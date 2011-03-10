@@ -3,6 +3,7 @@ namespace NAnt.Restrict.Filters {
 	#region using
 	using System;
 	using System.IO;
+	using System.Text;
 	using System.Xml.Schema;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
@@ -51,6 +52,22 @@ namespace NAnt.Restrict.Filters {
 
 		public override FilterPriority Priority {
 			get { return FilterPriority.File; }
+		}
+
+		public override string Description() {
+			StringBuilder sb = new StringBuilder();
+			sb.Append( "<date " );
+			if ( MillisecondsSinceEpoch != 0 ) {
+				this.AddParameter( sb, "mills", this.MillisecondsSinceEpoch );
+			} else if ( this.DateTime != this.epoch ) {
+				this.AddParameter( sb, "datetime", this.DateTime.ToString( "G" ) );
+			}
+			if ( this.Granularity > 1 ) {
+				this.AddParameter( sb, "granularity", this.Granularity );
+			}
+			this.AddParameter( sb, "when", this.When );
+			sb.Append( "/>" );
+			return sb.ToString();
 		}
 
 		public override bool Filter( IFileInfo File ) {

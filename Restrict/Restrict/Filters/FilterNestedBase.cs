@@ -2,6 +2,7 @@ namespace NAnt.Restrict.Filters {
 
 	#region using
 	using System.Collections.Generic;
+	using System.Text;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
 
@@ -85,6 +86,20 @@ namespace NAnt.Restrict.Filters {
 
 		public override FilterPriority Priority {
 			get { return FilterPriority.Nested; }
+		}
+
+		public override string Description() {
+			StringBuilder sb = new StringBuilder();
+			sb.Append( "<" );
+			sb.Append( this.Name );
+			sb.Append( ">" );
+			foreach ( FilterBase filter in Filters ) {
+				sb.Append( filter.Description() );
+			}
+			sb.Append( "</" );
+			sb.Append( this.Name );
+			sb.Append( ">" );
+			return sb.ToString();
 		}
 
 		/// <summary>

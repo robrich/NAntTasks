@@ -3,6 +3,7 @@ namespace NAnt.Restrict.Filters {
 	#region using
 	using System;
 	using System.IO;
+	using System.Text;
 	using System.Text.RegularExpressions;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
@@ -47,6 +48,24 @@ namespace NAnt.Restrict.Filters {
 
 		public override FilterPriority Priority {
 			get { return FilterPriority.File; }
+		}
+
+		public override string Description() {
+			StringBuilder sb = new StringBuilder();
+			sb.Append( "<name " );
+			if ( !string.IsNullOrEmpty( this.StringFilter ) ) {
+				this.AddParameter( sb, "name", this.StringFilter );
+			} else if ( !string.IsNullOrEmpty( this.RegexFilter ) ) {
+				this.AddParameter( sb, "regex", this.RegexFilter );
+			}
+			if ( this.CaseSensitive ) {
+				this.AddParameter( sb, "casesensitive", "true" );
+			}
+			if ( this.HandleDirSep ) {
+				this.AddParameter( sb, "handledirsep", "true" );
+			}
+			sb.Append( "/>" );
+			return sb.ToString();
 		}
 
 		public override bool Filter( IFileInfo File ) {

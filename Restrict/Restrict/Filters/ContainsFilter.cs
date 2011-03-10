@@ -2,6 +2,7 @@ namespace NAnt.Restrict.Filters {
 
 	#region using
 	using System;
+	using System.Text;
 	using System.Text.RegularExpressions;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
@@ -39,6 +40,21 @@ namespace NAnt.Restrict.Filters {
 
 		public override FilterPriority Priority {
 			get { return FilterPriority.Content; }
+		}
+
+		public override string Description() {
+			StringBuilder sb = new StringBuilder();
+			sb.Append( "<contains " );
+			if ( !string.IsNullOrEmpty( StringFilter ) ) {
+				this.AddParameter( sb, "string", this.StringFilter );
+			} else if ( !string.IsNullOrEmpty( this.RegexFilter ) ) {
+				this.AddParameter( sb, "regex", this.RegexFilter );
+			}
+			if ( this.CaseSensitive ) {
+				this.AddParameter( sb, "casesensitive", "true" );
+			}
+			sb.Append( "/>" );
+			return sb.ToString();
 		}
 
 		public override bool Filter( IFileInfo IFileInfo ) {
