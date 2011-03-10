@@ -9,11 +9,11 @@
 	<target name="Test">
 
 		<echo message="All dir" />
-		<restrict id="alldir">
+		<restrict id="alldir" verbose="true">
 			<fileset basedir=".">
 				<include name="**/**" />
 			</fileset>
-			<exists />
+			<not><name regex="\*\.cs" /></not>
 		</restrict>
 
 		<foreach item="File" property="File">
@@ -24,6 +24,10 @@
 				<echo message="Exists ${file::exists(File)}: ${File}" />
 			</do>
 		</foreach>
+		
+		<copy todir="build">
+			<fileset refid="alldir" />
+		</copy>
 
 		<echo message="bin dir" />
 		<restrict id="bindir">
@@ -41,6 +45,10 @@
 				<echo message="Exists ${file::exists(File)}: ${File}" />
 			</do>
 		</foreach>
+		
+		<copy todir="build">
+			<fileset refid="bindir" />
+		</copy>
 
 	</target>
 

@@ -91,7 +91,7 @@ namespace NAnt.Restrict.Filters {
 				try {
 					match = Regex.IsMatch( filename, regexPattern, options );
 				} catch (ArgumentException ex) {
-					throw new BuildException( string.Format( "Error in Regex: {0}, Message: {1}", regexPattern, ex.Message ), ex );
+					throw new BuildException( string.Format( "Error in Regex \"{0}\" on file \"{1}\", Message: {2}", regexPattern, filename, ex.Message ), ex );
 				}
 			}
 
