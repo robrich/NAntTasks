@@ -97,9 +97,10 @@ namespace NantProjectContent {
 
 			DirectoryScanner scanner = this.scanner; // Avoid re-reflecting every time
 			foreach ( string filename in content ) {
-				scanner.FileNames.Add( filename );
+				string filepath = Path.Combine( this.BaseDirectory.FullName, filename );
+				scanner.FileNames.Add( filepath );
 				if ( this.Verbose ) {
-					this.Log( Level.Info, filename );
+					this.Log( Level.Info, filepath );
 				}
 			}
 			this.hasScanned = true;

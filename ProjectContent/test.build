@@ -4,7 +4,7 @@
 
 	<property name="nant.settings.currentframework" value="net-3.5" overwrite="false" />
 
-	<loadtasks assembly="bin/Debug/ProjectToContent.dll" />
+	<loadtasks assembly="bin/Debug/NAnt.ProjectToContent.Tasks.dll" />
 
 	<target name="Test">
 
