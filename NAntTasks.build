@@ -17,22 +17,27 @@
  			<fileset basedir="build/ProjectContent">
  				<include name="**/**" />
  			</fileset>
- 		</copy>	
+ 		</copy>
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/Parallel/Parallel">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>
 		<copy todir="build" overwrite="true">
  			<fileset basedir="build/Restrict/Restrict">
  				<include name="**/**" />
  			</fileset>
- 		</copy>	
+ 		</copy>
 		<copy todir="build" overwrite="true">
  			<fileset basedir="build/SlnProjects">
  				<include name="**/**" />
  			</fileset>
- 		</copy>	
+ 		</copy>
 		<copy todir="build" overwrite="true">
  			<fileset basedir="build/SqlRunner/SqlRunner">
  				<include name="**/**" />
  			</fileset>
- 		</copy>	
+ 		</copy>
 		<copy todir="build" overwrite="true">
  			<fileset basedir="build/Yui Compressor/Projects/Yahoo.Yui.Compressor/Model">
  				<include name="**/**" />
@@ -91,8 +96,6 @@
 				<include name="**/Debug/**" />
 				<include name="**/Release/**" />
 				<include name="*.log" />
-				<include name="*results.xml" /><!-- NUnit results -->
-				<include name="*msbuild.xml" /><!-- MSBuild results -->
 				<include name="build/**" />
 				<include name="log/**" />
 			</fileset>
@@ -172,7 +175,7 @@
 	<target name="BuildSolution" description="Compiles the solutions">
 
 		<property name="PlatformNoSpace" value="${string::replace(Platform,' ','')}" />
-		
+
 		<foreach item="File" property="Solution">
 			<in>
 				<items basedir=".">
@@ -182,8 +185,8 @@
 			</in>
 			<do>
 				<property name="SolutionName" value="${path::get-file-name(Solution)}" />
-				<property name="nant.settings.currentframework" value="net-3.5" if="${SolutionName!='nant.jit.sln' and SolutionName!='Restrict.sln'}" />
-				<property name="nant.settings.currentframework" value="net-4.0" if="${SolutionName=='nant.jit.sln' or SolutionName=='Restrict.sln'}" />
+				<property name="nant.settings.currentframework" value="net-3.5" if="${SolutionName!='nant.jit.sln' and SolutionName!='Restrict.sln'} and SolutionName!='Parallel.sln'}" />
+				<property name="nant.settings.currentframework" value="net-4.0" if="${SolutionName=='nant.jit.sln' or SolutionName=='Restrict.sln'} or SolutionName=='Parallel.sln'}" />
 				<call target="CompileSolution" />
 			</do>
 		</foreach>
@@ -236,7 +239,7 @@
 
 		<property name="SourcePath" value="${string::replace(ProjectPath,BasePath,'')}" />
 		<property name="Dest" value="build/${SourcePath}" />
-			
+
  		<echo message="Copy ${ProjectName} from [${Project}] to [${Dest}]"/>
  		<mkdir dir="${Dest}" unless="${directory::exists(Dest)}" />
  		<copy todir="${Dest}" overwrite="true">
