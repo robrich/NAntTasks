@@ -185,8 +185,8 @@
 			</in>
 			<do>
 				<property name="SolutionName" value="${path::get-file-name(Solution)}" />
-				<property name="nant.settings.currentframework" value="net-3.5" if="${SolutionName!='nant.jit.sln' and SolutionName!='Restrict.sln'} and SolutionName!='Parallel.sln'}" />
-				<property name="nant.settings.currentframework" value="net-4.0" if="${SolutionName=='nant.jit.sln' or SolutionName=='Restrict.sln'} or SolutionName=='Parallel.sln'}" />
+				<property name="nant.settings.currentframework" value="net-3.5" if="${SolutionName!='nant.jit.sln' and SolutionName!='Restrict.sln' and SolutionName!='Parallel.sln'}" />
+				<property name="nant.settings.currentframework" value="net-4.0" if="${SolutionName=='nant.jit.sln' or SolutionName=='Restrict.sln' or SolutionName=='Parallel.sln'}" />
 				<call target="CompileSolution" />
 			</do>
 		</foreach>
