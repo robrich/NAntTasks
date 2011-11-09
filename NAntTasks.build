@@ -74,12 +74,18 @@
 		<echo file="${filename}" message="${string::trim-end(filecontents)}"/>
 	</target>
 
-	<script language="CSHARP" prefix="regex" >
+	<script language="CSHARP" prefix="regex">
+		<references>
+			<include name="System.dll" />
+		</references>
+		<imports>
+			<import namespace="System.Text.RegularExpressions" />
+		</imports>
 		<code>
 			<![CDATA[
 			[Function("replace")]
 			public static string Replace( string Input, string Pattern, string Replace ) {
-				return Regex.Replace( Input, Pattern, Regex.Unescape(Replace), System.Text.RegularExpressions.RegexOptions.Multiline );
+				return Regex.Replace( Input, Pattern, Regex.Unescape(Replace), RegexOptions.Multiline );
 			}
 			]]>
 		</code>
