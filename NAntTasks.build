@@ -24,6 +24,11 @@
  			</fileset>
  		</copy>
 		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/RazorShrinker/RazorShrinker.NAnt">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>
+		<copy todir="build" overwrite="true">
  			<fileset basedir="build/Restrict/Restrict">
  				<include name="**/**" />
  			</fileset>
