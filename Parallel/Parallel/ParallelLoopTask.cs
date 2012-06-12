@@ -12,6 +12,8 @@ namespace NAnt.Parallel {
 
 		private string[] props;
 		
+		/* old way */
+		
 		protected override void ExecuteTask() {
 			props = this.Property.Split( ',' );
 			base.ExecuteTask();
@@ -19,9 +21,10 @@ namespace NAnt.Parallel {
 		}
 
 		protected override void DoWork( params string[] propVals ) {
+		
 			// Start a new task on the thread pool
 			tasks.Add( Task.Factory.StartNew( () => {
-
+			
 				// Set thread-specific properties
 				for ( int i = 0; i < propVals.Length; i++ ) {
 					string propValue = propVals[i];
@@ -40,12 +43,10 @@ namespace NAnt.Parallel {
 							break;
 					}
 					string name = PropertyThreadMangler.GetName( props[i] );
-					lock ( this.Properties ) {
-						if ( this.Properties.Contains( name ) ) {
-							this.Properties[name] = propValue;
-						} else {
-							this.Properties.Add( name, propValue );
-						}
+					if ( this.Properties.Contains( name ) ) {
+						this.Properties[name] = propValue;
+					} else {
+						this.Properties.Add( name, propValue );
 					}
 				}
 
@@ -54,6 +55,30 @@ namespace NAnt.Parallel {
 
 			} ) );
 		}
+
+		/* new way
+
+		protected override void ExecuteTask() {
+			props = this.Property.Split( ',' );
+			for ( int i = 0; i < props.Length; i++ ) {
+				string name = props[i];
+				if ( this.Properties.Contains(name) ) {
+					this.Properties.Remove(name);
+				}
+				this.Properties.MarkLocal(name);
+			}
+			base.ExecuteTask();
+			Task.WaitAll( tasks.ToArray() );
+		}
+
+		protected override void DoWork( params string[] propVals ) {
+			// Start a new task on the thread pool
+			tasks.Add( Task.Factory.StartNew( () => {
+				base.DoWork(propVals);
+			} ) );
+		}
+
+		*/
 
 	}
 }
