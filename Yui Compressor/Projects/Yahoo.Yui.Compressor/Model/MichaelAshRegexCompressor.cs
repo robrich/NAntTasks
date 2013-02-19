@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -28,6 +28,12 @@ namespace Yahoo.Yui.Compressor
             */
             css = Regex.Replace(css, @"(?#no preceding space needed)\s+((?:[!{};>+()\],])|(?<={[^{}]*):(?=[^}]*}))", "$1");
             css = Regex.Replace(css, @"([!{}:;>+([,])\s+", "$1");  // Remove the spaces after the things that should not have spaces after them.
+            
+			// Put the space back in some cases, to support stuff like
+			// @media screen and (-webkit-min-device-pixel-ratio:0){
+			// https://github.com/isaacs/yuicompressor/commit/0e290b8e05392f19bccc2f7d524725a87739e6d6
+			css = Regex.Replace(css, "(@media[^{]*[^\\s])\\(", "$1 (");
+            
             css = Regex.Replace(css, @"([^;}])}", "$1;}");    // Add the semicolon where it's missing.
             css = Regex.Replace(css, @"(\d+)\.0+(p(?:[xct])|(?:[cem])m|%|in|ex)\b", "$1$2"); // Remove .0 from size units x.0em becomes xem
             css = Regex.Replace(css, @"([\s:])(0)(px|em|%|in|cm|mm|pc|pt|ex)\b", "$1$2"); // Remove unit from zero

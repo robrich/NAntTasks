@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -170,6 +170,10 @@ namespace Yahoo.Yui.Compressor
 
             string result = stringBuilder.ToString();
             result = result.RegexReplace("\\s+([!{};:>+\\(\\)\\],])", "$1");
+			// Put the space back in some cases, to support stuff like
+			// @media screen and (-webkit-min-device-pixel-ratio:0){
+			// https://github.com/isaacs/yuicompressor/commit/0e290b8e05392f19bccc2f7d524725a87739e6d6
+			result = result.RegexReplace("(@media[^{]*[^\\s])\\(", "$1 (");
             result = result.RegexReplace("___PSEUDOCLASSCOLON___", ":");
 
             return result;
