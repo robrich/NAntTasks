@@ -18,7 +18,11 @@
  				<include name="**/**" />
  			</fileset>
  		</copy>
- 		<!-- CSSValidator sprawls already -->
+		<copy todir="build/CssValidator" overwrite="true">
+ 			<fileset basedir="build/all/CssValidator">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>
 		<copy todir="build" overwrite="true">
  			<fileset basedir="build/all/GrepTask/GrepTask">
  				<include name="**/**" />
@@ -31,6 +35,11 @@
  		</copy>
 		<copy file="build/all/NAntMigrations/NAntMigrations/NAntMigrations/NAnt.DbMigrations.Tasks.exe" 
 			tofile="build/NAnt.DbMigrations.Tasks.dll" overwrite="true" />
+		<copy todir="build/NAntMigrations" overwrite="true">
+ 			<fileset basedir="build/all/NAntMigrations/NAntMigrations/NAntMigrations">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>
 		<copy todir="build" overwrite="true">
  			<fileset basedir="build/Parallel/Parallel">
  				<include name="**/**" />
