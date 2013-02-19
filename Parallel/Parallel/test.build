@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<project name="Test ProjectToContent" default="Test" basedir="."
+	xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+	
+	<!--
+	
+	Can't use ${prop} because properties aren't thread-specific under the hood
+	Instead use ${thread::get-value('prop')}
+	As a short-cut, use ${t::val('prop')}
+	
+	Can't use <property name= because properties aren't thread-specific under the hood
+	Instead use <property-thread name= for thread-specific properties
+	
+	${thread::get-thread-id()} returns the thread id
+	short-cut is ${t::id()}
+	
+	Tasks are:
+	<parallel>
+		<do>
+			... stuff
+		</do>
+		<do>
+			... stuff
+		</do>
+		...
+	</parallel>
+	
+	<foreach-parallel>
+		<in>...
+		<do>...
+	</foreach>
+	
+	-->
+
+	<property name="nant.settings.currentframework" value="net-4.0" overwrite="true" />
+
+	<loadtasks assembly="bin/Debug/NAnt.Parallel.Tasks.dll" />
+
+	<target name="Test-Parallel">
+		<echo message="Parallel" />
+	
+		<property name="common" value="value" />
+		<property-thread name="common" value="value" />
+		<echo message="Before (${thread::get-thread-id()}): ${datetime::get-second(datetime::now())} - ${common}" />
+		<echo message="main-t ${common} ${thread::get-value('common')}" />
+
+		<parallel>
+			<do>
+				<echo message="1 (${thread::get-thread-id()}): b ${datetime::get-second(datetime::now())} - ${common}" />
+				<property name="common" value="1" />
+				<property-thread name="common" value="1" />
+				<echo message="1-t ${t::val('common')}" />
+
+				<echo message="1 (${t::id()}): a ${datetime::get-second(datetime::now())} - ${common}" />
+				<sleep seconds="1" />
+				<echo message="1 (${t::id()}): s ${datetime::get-second(datetime::now())} - ${common}" />
+				<echo message="1-t ${t::val('common')}" />
+			</do>
+			<do>
+				<echo message="2 (${thread::get-thread-id()}): b ${datetime::get-second(datetime::now())} - ${common}" />
+				<property name="common" value="2" />
+				<property-thread name="common" value="2" />
+				<echo message="2-t ${thread::get-value('common')}" />
+
+				<echo message="2 (${thread::get-thread-id()}): a ${datetime::get-second(datetime::now())} - ${common}" />
+				<sleep seconds="1" />
+				<echo message="2 (${thread::get-thread-id()}): s ${datetime::get-second(datetime::now())} - ${common}" />
+				<echo message="2-t ${thread::get-value('common')}" />
+			</do>
+		</parallel>
+		
+		<echo message="After (${thread::get-thread-id()}): ${datetime::get-second(datetime::now())} - ${common}" />
+		<echo message="main-t ${common} ${thread::get-value('common')}" />
+
+	</target>
+
+	<target name="Test-Foreach">
+		<echo message="Foreach" />
+	
+		<property name="common" value="value" />
+		<echo message="Before (${thread::get-thread-id()}): ${datetime::get-second(datetime::now())} - ${common}" />
+
+		<foreach-parallel item="File" property="filename">
+			<in>
+				<items>
+					<include name="**" />
+				</items>
+			</in>
+			<do>
+				<echo message="${t::id()}: b ${datetime::get-second(datetime::now())} - ${t::val('filename')}" />
+				<sleep seconds="1" />
+				<echo message="${t::id()}: s ${datetime::get-second(datetime::now())} - ${t::val('filename')}" />
+			</do>
+		</foreach-parallel>
+		
+		<echo message="After (${t::id()}): ${datetime::get-second(datetime::now())} - ${common}" />
+
+	</target>
+	
+	<target name="Test" depends="Test-Parallel,Test-Foreach" /><!-- Test-Parallel Test-Foreach /-->
+
+</project>
