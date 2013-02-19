@@ -38,7 +38,7 @@
 				grepEngine.FindInFile( file, searchTerm, results );
 			}
 
-			if ( this.Verbose ) {
+			if ( this.Verbose && results.Count > 0 ) {
 				StringBuilder sb = new StringBuilder();
 				foreach ( KeyValuePair<FileInfo, List<string>> entry in results ) {
 					if ( sb.Length > 0 ) {
@@ -55,14 +55,14 @@
 
 			bool found = results.Count > 0;
 			if ( found && this.FailOnFound ) {
-				string mess = "Found " + searchTerm + " in specified files";
+				string mess = "Found \"" + searchTerm + "\" in specified files";
 				if ( !this.Verbose ) {
 					mess += ", verbose=true to list matches";
 				}
 				throw new BuildException( mess );
 			}
 			if ( !found && this.FailOnMissing ) {
-				throw new BuildException( "Did not find " + searchTerm + " in specified files" );
+				throw new BuildException( "Did not find \"" + searchTerm + "\" in specified files" );
 			}
 
 		}
