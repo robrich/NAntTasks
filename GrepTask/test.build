@@ -7,10 +7,15 @@
 	<loadtasks assembly="GrepTask/bin/Debug/NAnt.Grep.Tasks.dll" />
 
 	<target name="Test">
-		<grep-test searchTerm="Html.Raw" failOnFound="true" verbose="true">
+		<grep-test searchTerm="ViewBag" failOnFound="true" verbose="true">
 			<fileset basedir=".">
 				<include name="**/*.cshtml" />
+				<include name="**/*.cs" />
 			</fileset>
+			<ignoreTerms>
+				<term ignoreTerm="ViewBag.Title" />
+				<term ignoreTerm="ViewBag.FullWidth" />
+			</ignoreTerms>
 		</grep-test>
 	</target>
 

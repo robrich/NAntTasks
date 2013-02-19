@@ -1,10 +1,16 @@
 ﻿namespace NAnt.Grep.Tasks {
+	using System.Linq;
 	using NAnt.Core;
 	using NAnt.Core.Attributes;
 	using NAnt.Core.Types;
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Text;
+
+	public class TermElement : Element {
+		[TaskAttribute( "ignoreTerm", Required = false )]
+		public string IgnoreTerm { get; set; }
+	}
 
 	[TaskName( "grep-test" )]
 	public class GrepTask : Task {
@@ -16,6 +22,12 @@
 		[TaskAttribute( "searchTerm", Required = true )]
 		public string SearchTerm { get; set; }
 
+		[TaskAttribute( "ignoreTerm", Required = false )]
+		public string IgnoreTerm { get; set; }
+
+		[BuildElementCollection( "ignoreTerms", "term" )]
+		public TermElement[] IgnoreTerms { get; set; }
+
 		[TaskAttribute( "failOnFound", Required = false )]
 		public bool FailOnFound { get; set; }
 
@@ -25,6 +37,18 @@
 		protected override void ExecuteTask() {
 
 			string searchTerm = this.SearchTerm;
+			List<string> ignoreTerms = new List<string>();
+			if ( !string.IsNullOrWhiteSpace( this.IgnoreTerm ) ) {
+				ignoreTerms.Add( this.IgnoreTerm );
+			}
+			if ( this.IgnoreTerms != null ) {
+				ignoreTerms.AddRange(
+					from term in this.IgnoreTerms
+					where !string.IsNullOrWhiteSpace( term.IgnoreTerm )
+					select term.IgnoreTerm
+				);
+			}
+
 			FileSet filesToCheck = this.FilesToCheck;
 			if ( filesToCheck == null || filesToCheck.FileNames.Count == 0 ) {
 				throw new BuildException( "Can't grep an empty set of files" );
@@ -35,7 +59,7 @@
 			Dictionary<FileInfo, List<string>> results = new Dictionary<FileInfo, List<string>>();
 			foreach ( string fileName in filesToCheck.FileNames ) {
 				FileInfo file = new FileInfo( fileName );
-				grepEngine.FindInFile( file, searchTerm, results );
+				grepEngine.FindInFile( file, searchTerm, ignoreTerms, results );
 			}
 
 			if ( this.Verbose && results.Count > 0 ) {
