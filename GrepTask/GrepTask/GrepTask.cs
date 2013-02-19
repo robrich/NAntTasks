@@ -23,6 +23,7 @@
 		public bool FailOnMissing { get; set; }
 
 		protected override void ExecuteTask() {
+
 			string searchTerm = this.SearchTerm;
 			FileSet filesToCheck = this.FilesToCheck;
 			if ( filesToCheck == null || filesToCheck.FileNames.Count == 0 ) {
@@ -43,7 +44,8 @@
 					if ( sb.Length > 0 ) {
 						sb.AppendLine();
 					}
-					sb.AppendLine( entry.Key.FullName + ": " );
+					string filename = entry.Key.FullName.Replace( this.Project.BaseDirectory + "\\", "" );
+					sb.AppendLine( filename + ": " );
 					foreach ( string line in entry.Value ) {
 						sb.AppendLine( "  " + this.TrimToLength( line, 74 ) );
 					}
