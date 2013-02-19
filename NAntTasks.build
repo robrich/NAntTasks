@@ -14,57 +14,65 @@
 	<target name="CopyWeird">
 		<!-- FRAGILE: This assumes we've got them all -->
 		<copy todir="build" overwrite="true">
- 			<fileset basedir="build/ProjectContent">
+ 			<fileset basedir="build/AmazonS3/AmazonS3">
  				<include name="**/**" />
  			</fileset>
  		</copy>
+ 		<!-- CSSValidator sprawls already -->
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/all/GrepTask/GrepTask">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/all/Jit">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>
+		<copy file="build/all/NAntMigrations/NAntMigrations/NAnt.DbMigrations.Tasks.exe" 
+			tofile="build/NAnt.DbMigrations.Tasks.dll" overwrite="true" />
 		<copy todir="build" overwrite="true">
  			<fileset basedir="build/Parallel/Parallel">
  				<include name="**/**" />
  			</fileset>
  		</copy>
 		<copy todir="build" overwrite="true">
- 			<fileset basedir="build/RazorShrinker/RazorShrinker.NAnt">
+ 			<fileset basedir="build/all/ProjectContent">
  				<include name="**/**" />
  			</fileset>
  		</copy>
 		<copy todir="build" overwrite="true">
- 			<fileset basedir="build/Restrict/Restrict">
+ 			<fileset basedir="build/all/RazorShrinker/RazorShrinker.NAnt">
  				<include name="**/**" />
  			</fileset>
  		</copy>
 		<copy todir="build" overwrite="true">
- 			<fileset basedir="build/SlnProjects">
- 				<include name="**/**" />
- 			</fileset>
- 		</copy>
-		<copy todir="build" overwrite="true">
- 			<fileset basedir="build/SqlRunner/SqlRunner">
- 				<include name="**/**" />
- 			</fileset>
- 		</copy>
-		<copy todir="build" overwrite="true">
- 			<fileset basedir="build/Yui Compressor/Projects/Yahoo.Yui.Compressor/Model">
+ 			<fileset basedir="build/all/Restrict/Restrict">
  				<include name="**/**" />
  			</fileset>
  		</copy>
 		<copy todir="build/sass" overwrite="true">
- 			<fileset basedir="build/SassTask/SassTask">
+ 			<fileset basedir="build/all/SassTask/SassTask">
  				<include name="**/**" />
  			</fileset>
  		</copy>
 		<copy todir="build/sass-cmd" overwrite="true">
- 			<fileset basedir="build/SassTask/SassCommandLine">
+ 			<fileset basedir="build/all/SassTask/SassCommandLine">
  				<include name="**/**" />
  			</fileset>
  		</copy>
 		<copy todir="build" overwrite="true">
- 			<fileset basedir="build/GrepTask/GrepTask">
+ 			<fileset basedir="build/all/SlnProjects">
  				<include name="**/**" />
  			</fileset>
  		</copy>
 		<copy todir="build" overwrite="true">
- 			<fileset basedir="build/AmazonS3/AmazonS3">
+ 			<fileset basedir="build/all/SqlRunner/SqlRunner">
+ 				<include name="**/**" />
+ 			</fileset>
+ 		</copy>
+		<copy todir="build" overwrite="true">
+ 			<fileset basedir="build/all/Yui Compressor/Projects/Yahoo.Yui.Compressor/Model">
  				<include name="**/**" />
  			</fileset>
  		</copy>
@@ -216,10 +224,10 @@
 			</in>
 			<do>
 				<property name="SolutionName" value="${path::get-file-name(Solution)}" />
-				<property name="nant.settings.currentframework" value="net-3.5" if="${SolutionName!='nant.jit.sln' and SolutionName!='Restrict.sln' and SolutionName!='Parallel.sln' and SolutionName!='SassTask.sln' and SolutionName!='AmazonS3Tasks.sln' and SolutionName!='GrepTask.sln'}" />
-				<property name="nant.settings.currentframework" value="net-4.0" if="${SolutionName=='nant.jit.sln' or SolutionName=='Restrict.sln' or SolutionName=='Parallel.sln' or SolutionName=='SassTask.sln' or SolutionName=='AmazonS3Tasks.sln' or SolutionName=='GrepTask.sln'}" />
-
-<property name="nant.settings.currentframework" value="net-4.0" />
+				<!--property name="nant.settings.currentframework" value="net-3.5" if="${SolutionName!='nant.jit.sln' and SolutionName!='Restrict.sln' and SolutionName!='Parallel.sln' and SolutionName!='SassTask.sln' and SolutionName!='AmazonS3Tasks.sln' and SolutionName!='GrepTask.sln'}" />
+				<property name="nant.settings.currentframework" value="net-4.0" if="${SolutionName=='nant.jit.sln' or SolutionName=='Restrict.sln' or SolutionName=='Parallel.sln' or SolutionName=='SassTask.sln' or SolutionName=='AmazonS3Tasks.sln' or SolutionName=='GrepTask.sln'}" /-->
+				<!-- FRAGILE: Build all as .net 4.0 now -->
+				<property name="nant.settings.currentframework" value="net-4.0" />
 
 				<call target="CompileSolution" />
 			</do>
@@ -272,7 +280,7 @@
 		<property name="ProjectName" value="${path::get-file-name(ProjectPath)}" />
 
 		<property name="SourcePath" value="${string::replace(ProjectPath,BasePath,'')}" />
-		<property name="Dest" value="build/${SourcePath}" />
+		<property name="Dest" value="build/all/${SourcePath}" />
 
  		<echo message="Copy ${ProjectName} from [${Project}] to [${Dest}]"/>
  		<mkdir dir="${Dest}" unless="${directory::exists(Dest)}" />
