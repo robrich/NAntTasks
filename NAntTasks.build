@@ -29,7 +29,7 @@
  				<include name="**/**" />
  			</fileset>
  		</copy>
-		<copy file="build/all/NAntMigrations/NAntMigrations/NAnt.DbMigrations.Tasks.exe" 
+		<copy file="build/all/NAntMigrations/NAntMigrations/NAntMigrations/NAnt.DbMigrations.Tasks.exe" 
 			tofile="build/NAnt.DbMigrations.Tasks.dll" overwrite="true" />
 		<copy todir="build" overwrite="true">
  			<fileset basedir="build/Parallel/Parallel">
