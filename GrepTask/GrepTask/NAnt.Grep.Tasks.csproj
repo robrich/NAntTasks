@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="NAnt.Core">
       <HintPath>..\References\NAnt.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
