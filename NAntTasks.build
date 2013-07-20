@@ -7,10 +7,11 @@
 	<property name="Configuration" value="Release" overwrite="false" />
 	<property name="Debug" value="false" />
 	<property name="DebugConditional" value="" />
-	<property name="MSBuildXmlLoggerPath" value="C:\ci\CruiseControl.NET\server\ThoughtWorks.CruiseControl.MsBuild.dll" />
+	<property name="MSBuildVerbosity" value="Minimal" overwrite="false" />
 
 
 	<target name="Build_Release" depends="Release,Clean,RevertVersion,Build,CopyWeird" />
+
 	<target name="CopyWeird">
 		<!-- FRAGILE: This assumes we've got them all -->
 		<copy todir="build" overwrite="true">
@@ -154,63 +155,120 @@
 	</target>
 
 
-	<!-- Get the current SVN version -->
-	<target name="GetVersion" description="Get the version from svn">
+	<!-- Get the current version -->
+	<target name="GetVersion">
+		<mkdir dir="log" if="${not(directory::exists('log'))}" />
 
-		<!-- A bunch of mayhem because exec can't output to a variable -->
-		<exec program="svn.exe" workingdir="${project::get-base-directory()}" output="version.log" failonerror="true">
-			<arg value="info" />
-			<arg value="--xml" />
-		</exec>
-		<xmlpeek file="version.log"
-				 property="svn-version"
-				 xpath="/info/entry/commit/@revision" />
-		<delete file="version.log" />
+		<if test="${directory::exists('.svn')}">
+			<!-- A bunch of mayhem because exec can't output to a variable -->
+			<exec program="svn.exe" workingdir="${project::get-base-directory()}" output="log/version.log" failonerror="true">
+				<arg value="info" />
+				<arg value="--xml" />
+			</exec>
+			<xmlpeek file="log/version.log"
+					 property="version-id"
+					 xpath="/info/entry/commit/@revision" />
+			<property name="version-name" value="svn-${version-id}" />
 
-		<echo>Current version from Subversion is ${svn-version}</echo>
+			<echo>Current version from Subversion is ${version-id}</echo>
+		</if>
+
+		<if test="${directory::exists('.hg')}">
+			<!-- A bunch of mayhem because exec can't output to a variable -->
+			<exec program="hg.exe" workingdir="${project::get-base-directory()}" output="log/version.log" failonerror="true">
+				<arg value="log" />
+				<arg value="--limit=1" />
+				<arg value="--style=xml" />
+			</exec>
+			<xmlpeek file="log/version.log"
+					 property="version-id"
+					 xpath="/log/logentry/@revision" />
+			<xmlpeek file="log/version.log"
+					 property="version-name"
+					 xpath="/log/logentry/@node" />
+
+			<echo>Current version from Mercurial is ${version-id}, node is ${version-name}</echo>
+		</if>
+
+		<if test="${directory::exists('.git')}">
+			<!-- A bunch of mayhem because exec can't output to a variable -->
+			<exec program="git.exe" output="log/version.log" failonerror="false">
+				<arg value="log" />
+				<arg value="-1" />
+				<arg value="--format=%h" /><!-- %H is full hash, %h is short hash -->
+			</exec>
+			<loadfile file="log/version.log" property="version-name" />
+
+			<![CDATA[-- in git, version-id could be '# of commits' from "git log --format=%h | wc -l | sed 's/ //g'" but it doesn't seem that helpful --]]>
+			<property name="version-id" value="*" />
+
+			<echo>Current version from Git is ${version-id}, node is ${version-name}</echo>
+		</if>
+
+		<property name="version-name" value="${string::trim(version-name)}" />
+		<fail if="${version-id==''}" message="Can't determine version id" />
+		<fail if="${version-name==''}" message="Can't determine version name" />
 	</target>
+
+	<fileset id="AssemblyInfos" basedir=".">
+		<exclude name="**/-*-/**/AssemblyInfo.cs" />
+		<include name="**/AssemblyInfo.cs" />
+		<include name="GlobalAssemblyInfo.cs" />
+	</fileset>
 
 	<target name="SetVersion" depends="GetVersion,RevertVersion">
 
 		<!-- This isn't a regular expression, this is a hard-coded major/minor: -->
-		<property name="content-from" value=".*&quot;" />
-		<property name="content-to" value=".${svn-version}&quot;" />
+		<property name="version-id-from" value=".*&quot;" />
+		<property name="version-id-to" value=".${version-id}&quot;" />
+		<property name="version-name-from" value="AssemblyDescription&#40; &quot;&quot;" />
+		<property name="version-name-to" value="AssemblyDescription&#40; &quot;${version-name}&quot;" />
 
-		<echo message="Changing from ${content-from} to ${content-to} in AssemblyInfo files" />
+		<echo message="Changing from ${version-id-from} to ${version-id-to} and ${version-name-from} to ${version-name-to} in AssemblyInfo files" />
 
 		<foreach item="File" property="file">
 			<in>
 				<items refid="AssemblyInfos" />
 			</in>
 			<do>
-
 				<loadfile file="${file}" property="filecontents">
 					<filterchain>
-						<replacestring from="${content-from}" to="${content-to}" ignorecase="true" />
+						<replacestring from="${version-id-from}" to="${version-id-to}" ignorecase="true" />
+						<replacestring from="${version-name-from}" to="${version-name-to}" ignorecase="true" />
 					</filterchain>
 				</loadfile>
-				<echo file="${file}" message="${string::trim-end(filecontents)}"/>
+				<echo file="${file}" message="${filecontents}"/>
 			</do>
 		</foreach>
 
 	</target>
 
-	<target name="RevertVersion" descripiton="Put the files back so svn can change it next time">
-
-		<fileset id="AssemblyInfos" basedir=".">
-			<exclude name="**/-*-/**/AssemblyInfo.cs" />
-			<include name="**/AssemblyInfo.cs" />
-		</fileset>
+	<target name="RevertVersion" descripiton="Put the files back so next build can change it">
 
 		<foreach item="File" property="file">
 			<in>
 				<items refid="AssemblyInfos" />
 			</in>
 			<do>
-				<exec program="svn.exe" failonerror="true">
-					<arg value="revert" />
-					<arg value="${file}" />
-				</exec>
+				<if test="${directory::exists('.svn')}">
+					<exec program="svn.exe" failonerror="true">
+						<arg value="revert" />
+						<arg value="${file}" />
+					</exec>
+				</if>
+				<if test="${directory::exists('.hg')}">
+					<exec program="hg.exe" failonerror="true">
+						<arg value="revert" />
+						<arg value="--no-backup" />
+						<arg value="${file}" />
+					</exec>
+				</if>
+				<if test="${directory::exists('.git')}">
+					<exec program="git.exe" failonerror="false">
+						<arg value="checkout" />
+						<arg value="${file}" />
+					</exec>
+				</if>
 			</do>
 		</foreach>
 
@@ -259,18 +317,10 @@
 
 	<target name="CompileSolution" description="Compiles 1 solution using msbuild">
 
-		<property name="MSBuildLogger" value="" />
-		<property name="MSBuildConsoleLogger" value="" />
-		<if test="${file::exists(MSBuildXmlLoggerPath)}">
-			<property name="MSBuildLogger" value="/l:ThoughtWorks.CruiseControl.MsBuild.XmlLogger,${MSBuildXmlLoggerPath};log\${SolutionName}-${PlatformNoSpace}.msbuild.xml" />
-			<property name="MSBuildConsoleLogger" value="/noconsolelogger" />
-			<mkdir dir="log" if="${not(directory::exists('log'))}" />
-		</if>
-
 		<echo message="Building ${Solution} for ${Platform}: ${nant.settings.currentframework} ${Configuration} ${DebugConditional}"/>
 		<msbuild
 			project="${Solution}"
-			verbosity="Normal"
+			verbosity="${MSBuildVerbosity}"
 			failonerror="true">
 			<property name="Configuration" value="${Configuration}" />
 			<property name="Platform" value="${Platform}" />
@@ -278,8 +328,6 @@
 			<property name="trace" value="${Debug}" />
 			<arg value='/m' />
 			<arg value='/p:DefineConstants="${DebugConditional}"' />
-			<arg value='${MSBuildLogger}' />
-			<arg value='${MSBuildConsoleLogger}' />
 		</msbuild>
 	</target>
 
