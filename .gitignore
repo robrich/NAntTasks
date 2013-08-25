@@ -22,3 +22,4 @@ TestResults
 *.mdf
 *.ldf
 *.cache
+CssValidator/test.log
