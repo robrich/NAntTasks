@@ -26,7 +26,7 @@ namespace NAnt.AmazonS3.Tasks {
 					Key = this.DestinationFile
 				};
 				if ( PublicRead ) {
-					request.AddHeader( "x-amz-acl", "public-read" );
+					uploadRequest.AddHeader( "x-amz-acl", "public-read" );
 				}
 				transferUtility.Upload( uploadRequest );
 			}
