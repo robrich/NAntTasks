@@ -69,9 +69,9 @@ namespace NAntSlnToProjects {
 						continue; // It doesn't exist 'cause the path is bogus
 					}
 				}
-				
+
 				if ( ProjectType != ProjectTypes.All ) {
-					
+
 					// If it doesn't exist, we can't check it's type
 					try {
 						if ( !File.Exists( project ) ) {
@@ -93,11 +93,13 @@ namespace NAntSlnToProjects {
 					bool web = ( text.IndexOf( "<Content Include=\"Web.config\"", StringComparison.InvariantCultureIgnoreCase ) > -1 )
 								|| ( text.IndexOf( "{349c5851-65df-11da-9384-00065b846f21}", StringComparison.InvariantCultureIgnoreCase ) > -1 ); // Web Application Project
 					bool database = ( text.IndexOf( "\"$(MSBuildExtensionsPath)\\Microsoft\\VisualStudio\\v10.0\\TeamData\\Microsoft.Data.Schema.SqlTasks.targets\"", StringComparison.InvariantCultureIgnoreCase ) > -1 );
-					bool test = ( text.IndexOf( "<Reference Include=\"nunit.framework", StringComparison.InvariantCultureIgnoreCase ) > -1 );
+					bool test = ( text.IndexOf( "<Reference Include=\"nunit.framework", StringComparison.InvariantCultureIgnoreCase ) > -1 )
+								|| ( text.IndexOf( "<Reference Include=\"xunit.", StringComparison.InvariantCultureIgnoreCase ) > -1 )
+								|| ( text.IndexOf( "{3AC096D0-A1C2-E12C-1390-A8335801FDAB}", StringComparison.InvariantCultureIgnoreCase ) > -1 ); // Test Project
 
 					switch ( ProjectType ) {
 						case ProjectTypes.All: break; // Everything is fine
-							
+
 						case ProjectTypes.Endpoint: if ( !app && !web && !test && !database ) { continue; } break;
 
 						case ProjectTypes.Web: if ( !web ) { continue; } break;
